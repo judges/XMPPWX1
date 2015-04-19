@@ -1,7 +1,7 @@
 //
 //  LoginViewController.swift
 //  XMPPWX
-//
+//  只用有传递数据，并不能处理数据
 //  Created by Liuzhao on 15/4/11.
 //  Copyright (c) 2015年 Liuzhao. All rights reserved.
 //
@@ -10,10 +10,30 @@ import UIKit
 
 class LoginViewController: UIViewController {
     @IBOutlet weak var doneButton: UIBarButtonItem!
-    @IBOutlet weak var userTexeField: UITextField!
+    @IBOutlet weak var userTextField: UITextField!
     @IBOutlet weak var pwdTextField: UITextField!
     @IBOutlet weak var serverTextField: UITextField!
+    @IBOutlet weak var autoLoginSwith: UISwitch!
+    //是否请求登陆
+    @IBOutlet weak var registerButton: UIBarButtonItem!
 
+    func allDL() -> AppDelegate{
+        return UIApplication.sharedApplication().delegate as! AppDelegate
+    }
+    
+    @IBAction func registerAction(sender: UIBarButtonItem) {
+        NSUserDefaults.standardUserDefaults().setObject(userTextField.text, forKey: "wxID")
+        NSUserDefaults.standardUserDefaults().setObject(pwdTextField.text, forKey: "wxPwd")
+        NSUserDefaults.standardUserDefaults().setObject(serverTextField.text, forKey: "wxServer")
+        //是否勾选自动登录
+        NSUserDefaults.standardUserDefaults().setBool(self.autoLoginSwith.on, forKey: "wxAutoLogin")
+        
+        //同步用户配置
+        NSUserDefaults.standardUserDefaults().synchronize()
+        allDL().registerUser()        
+    }
+    var isRequireLogin = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -23,9 +43,19 @@ class LoginViewController: UIViewController {
     }
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        if sender as! NSObject == self.doneButton {
-            NSUserDefaults.standardUserDefaults().setObject(userTexeField, forKey: "wxID")
+        if sender as! UIBarButtonItem == self.doneButton {
+            //放到字典中去
+            NSUserDefaults.standardUserDefaults().setObject(userTextField.text, forKey: "wxID")
+            NSUserDefaults.standardUserDefaults().setObject(pwdTextField.text, forKey: "wxPwd")
+            NSUserDefaults.standardUserDefaults().setObject(serverTextField.text, forKey: "wxServer")
+            //是否勾选自动登录
+            NSUserDefaults.standardUserDefaults().setBool(self.autoLoginSwith.on, forKey: "wxAutoLogin")
             
+            //同步用户配置
+            NSUserDefaults.standardUserDefaults().synchronize()
+            
+            //需要登陆
+            isRequireLogin = true
         }
     }
     
