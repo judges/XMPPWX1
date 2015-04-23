@@ -11,7 +11,6 @@
 		D65118611AD8B5140007CE85 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D651185F1AD8B5140007CE85 /* Main.storyboard */; };
 		D65118631AD8B5140007CE85 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D65118621AD8B5140007CE85 /* Images.xcassets */; };
 		D65118661AD8B5140007CE85 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = D65118641AD8B5140007CE85 /* LaunchScreen.xib */; };
-		D65118721AD8B5140007CE85 /* XMPPWXTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65118711AD8B5140007CE85 /* XMPPWXTests.swift */; };
 		D651187C1AD8B75B0007CE85 /* FriendListViewControlTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D651187B1AD8B75B0007CE85 /* FriendListViewControlTableViewController.swift */; };
 		D65118801AD8BC540007CE85 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = D651187F1AD8BC540007CE85 /* Message.swift */; };
 		D65118861AD8C0BF0007CE85 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D65118851AD8C0BF0007CE85 /* LoginViewController.swift */; };
@@ -20,12 +19,15 @@
 		D65118941AD917B40007CE85 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D65118931AD917B40007CE85 /* SystemConfiguration.framework */; };
 		D65118961AD917C00007CE85 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D65118951AD917C00007CE85 /* CoreData.framework */; };
 		D65118981AD917C90007CE85 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D65118971AD917C90007CE85 /* CFNetwork.framework */; };
-		D651189A1AD917D10007CE85 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D65118991AD917D00007CE85 /* UIKit.framework */; };
 		D651189C1AD918090007CE85 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D651189B1AD918090007CE85 /* libxml2.dylib */; };
-		D651189E1AD918120007CE85 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D651189D1AD918120007CE85 /* Foundation.framework */; };
 		D65118A01AD918200007CE85 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D651189F1AD918200007CE85 /* CoreGraphics.framework */; };
 		D65118A21AD918320007CE85 /* libresolv.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D65118A11AD918320007CE85 /* libresolv.dylib */; };
 		D65118A61AD9198C0007CE85 /* libidn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D65118A31AD918D20007CE85 /* libidn.a */; };
+		D6655D611AE4E27F00EFDD4A /* idn-int.h in Frameworks */ = {isa = PBXBuildFile; fileRef = D6AC9AA61ADEA74900EACBD4 /* idn-int.h */; };
+		D6655D621AE4E28D00EFDD4A /* stringprep.h in Frameworks */ = {isa = PBXBuildFile; fileRef = D6AC9AA81ADEA74900EACBD4 /* stringprep.h */; };
+		D6655D641AE62F8200EFDD4A /* SideMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6655D631AE62F8200EFDD4A /* SideMenu.swift */; };
+		D6655D661AE62FF400EFDD4A /* MenuTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6655D651AE62FF400EFDD4A /* MenuTableViewController.swift */; };
+		D6655D6A1AE6905C00EFDD4A /* SearchTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6655D691AE6905C00EFDD4A /* SearchTableViewController.swift */; };
 		D6AC99A81ADD464000EACBD4 /* StateDL.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6AC99A71ADD464000EACBD4 /* StateDL.swift */; };
 		D6AC99AA1ADD464E00EACBD4 /* MessageDL.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6AC99A91ADD464E00EACBD4 /* MessageDL.swift */; };
 		D6AC9AA91ADEA74900EACBD4 /* XMPPAnonymousAuthentication.m in Sources */ = {isa = PBXBuildFile; fileRef = D6AC9A421ADEA74900EACBD4 /* XMPPAnonymousAuthentication.m */; };
@@ -67,7 +69,6 @@
 		D6AC9ACD1ADEA74900EACBD4 /* DDXMLElement.m in Sources */ = {isa = PBXBuildFile; fileRef = D6AC9A9F1ADEA74900EACBD4 /* DDXMLElement.m */; };
 		D6AC9ACE1ADEA74900EACBD4 /* DDXMLNode.m in Sources */ = {isa = PBXBuildFile; fileRef = D6AC9AA11ADEA74900EACBD4 /* DDXMLNode.m */; };
 		D6AC9ACF1ADEA74900EACBD4 /* build-libidn.sh in Resources */ = {isa = PBXBuildFile; fileRef = D6AC9AA51ADEA74900EACBD4 /* build-libidn.sh */; };
-		D6AC9AD01ADEA74900EACBD4 /* libidn.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D6AC9AA71ADEA74900EACBD4 /* libidn.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,8 +89,6 @@
 		D65118621AD8B5140007CE85 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		D65118651AD8B5140007CE85 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		D651186B1AD8B5140007CE85 /* XMPPWXTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = XMPPWXTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D65118701AD8B5140007CE85 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D65118711AD8B5140007CE85 /* XMPPWXTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XMPPWXTests.swift; sourceTree = "<group>"; };
 		D651187B1AD8B75B0007CE85 /* FriendListViewControlTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FriendListViewControlTableViewController.swift; sourceTree = "<group>"; };
 		D651187F1AD8BC540007CE85 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		D65118851AD8C0BF0007CE85 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
@@ -104,6 +103,9 @@
 		D651189F1AD918200007CE85 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		D65118A11AD918320007CE85 /* libresolv.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libresolv.dylib; path = usr/lib/libresolv.dylib; sourceTree = SDKROOT; };
 		D65118A31AD918D20007CE85 /* libidn.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libidn.a; path = /Users/liuz/Documents/XMPPFramework/XMPP/Vendor/libidn/libidn.a; sourceTree = "<absolute>"; };
+		D6655D631AE62F8200EFDD4A /* SideMenu.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SideMenu.swift; sourceTree = "<group>"; };
+		D6655D651AE62FF400EFDD4A /* MenuTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MenuTableViewController.swift; sourceTree = "<group>"; };
+		D6655D691AE6905C00EFDD4A /* SearchTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchTableViewController.swift; sourceTree = "<group>"; };
 		D6AC87B11ADD32A300EACBD4 /* xmpph.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xmpph.h; sourceTree = "<group>"; };
 		D6AC99A71ADD464000EACBD4 /* StateDL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateDL.swift; sourceTree = "<group>"; };
 		D6AC99A91ADD464E00EACBD4 /* MessageDL.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageDL.swift; sourceTree = "<group>"; };
@@ -199,13 +201,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D6655D621AE4E28D00EFDD4A /* stringprep.h in Frameworks */,
+				D6655D611AE4E27F00EFDD4A /* idn-int.h in Frameworks */,
 				D65118A61AD9198C0007CE85 /* libidn.a in Frameworks */,
 				D65118A21AD918320007CE85 /* libresolv.dylib in Frameworks */,
 				D65118A01AD918200007CE85 /* CoreGraphics.framework in Frameworks */,
-				D651189E1AD918120007CE85 /* Foundation.framework in Frameworks */,
-				D6AC9AD01ADEA74900EACBD4 /* libidn.a in Frameworks */,
 				D651189C1AD918090007CE85 /* libxml2.dylib in Frameworks */,
-				D651189A1AD917D10007CE85 /* UIKit.framework in Frameworks */,
 				D65118981AD917C90007CE85 /* CFNetwork.framework in Frameworks */,
 				D65118961AD917C00007CE85 /* CoreData.framework in Frameworks */,
 				D65118941AD917B40007CE85 /* SystemConfiguration.framework in Frameworks */,
@@ -229,7 +230,6 @@
 				D6AC87B11ADD32A300EACBD4 /* xmpph.h */,
 				D65118A71AD919CA0007CE85 /* framework */,
 				D65118581AD8B5140007CE85 /* XMPPWX */,
-				D651186E1AD8B5140007CE85 /* XMPPWXTests */,
 				D65118571AD8B5140007CE85 /* Products */,
 				D6AC9A3E1ADEA74900EACBD4 /* XMPP */,
 			);
@@ -258,6 +258,9 @@
 				D65118591AD8B5140007CE85 /* Supporting Files */,
 				D6AC99A71ADD464000EACBD4 /* StateDL.swift */,
 				D6AC99A91ADD464E00EACBD4 /* MessageDL.swift */,
+				D6655D631AE62F8200EFDD4A /* SideMenu.swift */,
+				D6655D651AE62FF400EFDD4A /* MenuTableViewController.swift */,
+				D6655D691AE6905C00EFDD4A /* SearchTableViewController.swift */,
 			);
 			path = XMPPWX;
 			sourceTree = "<group>";
@@ -266,23 +269,6 @@
 			isa = PBXGroup;
 			children = (
 				D651185A1AD8B5140007CE85 /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		D651186E1AD8B5140007CE85 /* XMPPWXTests */ = {
-			isa = PBXGroup;
-			children = (
-				D65118711AD8B5140007CE85 /* XMPPWXTests.swift */,
-				D651186F1AD8B5140007CE85 /* Supporting Files */,
-			);
-			path = XMPPWXTests;
-			sourceTree = "<group>";
-		};
-		D651186F1AD8B5140007CE85 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				D65118701AD8B5140007CE85 /* Info.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -679,6 +665,8 @@
 				D6AC9AB11ADEA74900EACBD4 /* NSData+XMPP.m in Sources */,
 				D6AC9AC21ADEA74900EACBD4 /* GCDAsyncSocket.m in Sources */,
 				D6AC9ABC1ADEA74900EACBD4 /* DDList.m in Sources */,
+				D6655D641AE62F8200EFDD4A /* SideMenu.swift in Sources */,
+				D6655D6A1AE6905C00EFDD4A /* SearchTableViewController.swift in Sources */,
 				D651185C1AD8B5140007CE85 /* AppDelegate.swift in Sources */,
 				D6AC9ACE1ADEA74900EACBD4 /* DDXMLNode.m in Sources */,
 				D6AC9ACD1ADEA74900EACBD4 /* DDXMLElement.m in Sources */,
@@ -694,6 +682,7 @@
 				D6AC9AB31ADEA74900EACBD4 /* NSXMLElement+XMPP.m in Sources */,
 				D6AC9AAA1ADEA74900EACBD4 /* XMPPDeprecatedDigestAuthentication.m in Sources */,
 				D6AC9ABB1ADEA74900EACBD4 /* XMPPStream.m in Sources */,
+				D6655D661AE62FF400EFDD4A /* MenuTableViewController.swift in Sources */,
 				D6AC9ABE1ADEA74900EACBD4 /* RFImageToDataTransformer.m in Sources */,
 				D6AC9AC91ADEA74900EACBD4 /* DispatchQueueLogFormatter.m in Sources */,
 				D6AC9AB81ADEA74900EACBD4 /* XMPPModule.m in Sources */,
@@ -718,7 +707,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D65118721AD8B5140007CE85 /* XMPPWXTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -49,6 +49,7 @@ extern const NSTimeInterval XMPPStreamTimeoutNone;
 @public
     int state;
 }
+-(void)setState:(int)num;
 /**
  * Standard XMPP initialization.
  * The stream is a standard client to server connection.

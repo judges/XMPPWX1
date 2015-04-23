@@ -17,11 +17,17 @@ class LoginViewController: UIViewController {
     //是否请求登陆
     @IBOutlet weak var registerButton: UIBarButtonItem!
 
-    func allDL() -> AppDelegate{
-        return UIApplication.sharedApplication().delegate as! AppDelegate
-    }
+    var ad:AppDelegate?
     
-    @IBAction func registerAction(sender: UIBarButtonItem) {
+    func allDL() -> AppDelegate{
+        if ad == nil{
+            ad = UIApplication.sharedApplication().delegate as? AppDelegate
+        }
+        return ad!
+    }
+
+    
+    func userSyn(){
         NSUserDefaults.standardUserDefaults().setObject(userTextField.text, forKey: "wxID")
         NSUserDefaults.standardUserDefaults().setObject(pwdTextField.text, forKey: "wxPwd")
         NSUserDefaults.standardUserDefaults().setObject(serverTextField.text, forKey: "wxServer")
@@ -30,6 +36,10 @@ class LoginViewController: UIViewController {
         
         //同步用户配置
         NSUserDefaults.standardUserDefaults().synchronize()
+    }
+    
+    @IBAction func registerAction(sender: UIBarButtonItem) {
+        userSyn()        
         allDL().registerUser()        
     }
     var isRequireLogin = false

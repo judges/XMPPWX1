@@ -177,7 +177,9 @@ enum XMPPStreamConfig
 @implementation XMPPStream
 
 @synthesize tag = userTag;
-
+-(void)setState:(int)num{
+    state = num;
+}
 /**
  * Shared initialization between the various init methods.
 **/

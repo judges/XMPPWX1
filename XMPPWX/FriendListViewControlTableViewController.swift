@@ -8,9 +8,9 @@
 
 import UIKit
 
-class FriendListViewControlTableViewController: UITableViewController , MessageDL , StateDL {
-    @IBOutlet weak var myState: UIBarButtonItem!
+class FriendListViewControlTableViewController: UITableViewController , MessageDL , StateDL ,SideMenuDelegate{
     
+    @IBOutlet weak var sideBarItem: UIBarButtonItem!
     //未读消息数组声明
     var unreadMsgList = [Message]()
     //好友状态数组声明
@@ -20,25 +20,29 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
     //当前聊天对象
     var currenFriendName = ""
     
-    //根据当前在线状态调整图片，并进行上下线操作
-    @IBAction func logStateChangAction(sender: UIBarButtonItem) {
-        if logged {
-            //下线
-            logoff()
-            //更改图片
-            sender.image = UIImage(named: "off")
-        }else{
-            //上线
-            login()
-            //更改图片
-            sender.image = UIImage(named: "on")
+    
+    var sideMenu:SideMenu?
+    func sideMenuDidSelectItemAtIndex(index: Int) {
+        sideMenu?.toggleMenu()
+        //添加好友
+        if index == 1{
+            self.performSegueWithIdentifier("toSearchSegue", sender: self)
         }
-
     }
     
-    func allDL() -> AppDelegate{
-        return UIApplication.sharedApplication().delegate as! AppDelegate
+    @IBAction func toggleSideMenu(sender: AnyObject) {
+        sideMenu?.toggleMenu()
     }
+    
+    var ad:AppDelegate?
+    
+    func allDL() -> AppDelegate{
+        if ad == nil{
+            ad = UIApplication.sharedApplication().delegate as? AppDelegate
+        }
+        return ad!
+    }
+
     
     //收到离线或者未读消息
     func newMsg(aMsg: Message) {
@@ -50,11 +54,100 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
             self.tableView.reloadData()
         }
     }
-    
-    //以下为三个状态的处理
+
+    var friends = [State]()
+    //以下为四个状态的处理
+    //init
+    func initStates(items: [DDXMLElement]) {
+        func set(str:String)->SubscribeType{
+            switch str{
+            case "none":
+                return .none
+            case "both":
+                return .both
+            case "from":
+                return .from
+            case "to":
+                return .to
+            default:
+                return .none
+            }
+        }
+        friends.removeAll(keepCapacity: false)
+        //设置整体friends 和 stateList(将要显示的)
+        for item in items{
+            let jid = item.attributeStringValueForName("jid")
+            let subt = item.attributeStringValueForName("subscription")
+            var judge = true
+            let count = stateList.count
+            for var i = 0 ; i < count ; i++ {
+                if stateList[i].name == jid{//有了就不加stateList，但是订阅类型得更新
+                    judge = false
+                    stateList[i].subscribeType = set(subt)
+                    break
+                }
+            }
+            var state_t = State()
+            state_t.isOnline = false
+            state_t.name = jid
+            state_t.subscribeType = set(subt)
+            //不管什么类型都加到friends中
+            friends.append(state_t)
+            //只显示我订阅的，和互相订阅的
+            if(judge && state_t.subscribeType != .none && state_t.subscribeType != .from){
+                stateList.append(state_t)
+            }
+        }
+        self.tableView.reloadData()
+    }
     //自己离线
     func meOff() {
         logoff()
+    }
+    //有人发来请求
+    func isSubscribe(inout state: State) {
+        //
+        var isFind = false
+        for (index ,oldState) in enumerate(friends) {
+            if (state.name == oldState.name) {
+                isFind = true
+                //找到就更新订阅状态
+                if friends[index].subscribeType == .to{
+                    friends[index].subscribeType = .both
+                }else{
+                    friends[index].subscribeType = .from
+                }
+                //找到就退出
+                break
+            }
+        }
+        if !isFind{
+            friends.append(state)
+        }
+    }
+    //有人同意我的请求
+    func isSubscribed(inout state: State) {
+        //是否已经在朋友列表中了，但肯定不在状态列表中，因为之前没有或者是.none和.from
+        var isFind = false
+        for (index ,oldState) in enumerate(friends) {
+            if (state.name == oldState.name) {
+                isFind = true
+                //找到就更新订阅状态
+                if friends[index].subscribeType == .from{
+                    friends[index].subscribeType = .both
+                }else{//以前是none
+                    friends[index].subscribeType = .to
+                }
+                //找到就退出
+                break
+            }
+        }
+        if !isFind{//根本就没有
+            state.subscribeType = .to
+            friends.append(state)
+        }
+        //同意我的请求，以前的状态可能是.none .from 都不会之前添加到要显示的列表
+        stateList.append(state)
     }
     //上线状态处理
     func isOn(state: State) {
@@ -89,9 +182,6 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
                 break
             }
         }
-        if !isFind{
-            stateList.append(state)
-        }
         //刷新
         self.tableView.reloadData()
     }
@@ -101,17 +191,13 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
         if logged == true {
             return
         }
-        
+
         //清空数组
         unreadMsgList.removeAll(keepCapacity: false)
         stateList.removeAll(keepCapacity: false)
         
         //连接调用xmpp的通信
         allDL().connect()
-        
-        //图片改为上线状态
-        myState.image = UIImage(named:"on")
-        
         logged = true
         
         //取用户名，并更新title
@@ -133,9 +219,6 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
         stateList.removeAll(keepCapacity: false)
         
         allDL().disConnect()
-        //图片改为下线状态
-        myState.image = UIImage(named:"off")
-        
         logged = false
         
         //更新表格数据
@@ -145,13 +228,14 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
     
     override func viewDidLoad() {//只会加载一次
         super.viewDidLoad()
-        
+        sideMenu = SideMenu(sourceView: self.view, menuData: ["好友列表", "查找好友", "其他功能","其他功能2","其他功能3"])
+        sideMenu!.delegate = self
         //取用户名
         let myID = NSUserDefaults.standardUserDefaults().stringForKey("wxID")
         //取自动登录
         let autoLogin = NSUserDefaults.standardUserDefaults().boolForKey("wxAutoLogin")
         //如果取到用户名或者自动登录，开始登陆
-        if ( myID != nil && autoLogin ){
+        if ( myID != nil && autoLogin && allDL().isAuth ){
             self.login()
             
         }else{
@@ -161,7 +245,7 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
         //接管消息代理
         //allDL().messageDL = self
         //接管状态代理
-        allDL().stateDL = self
+        //allDL().stateDL = self
 
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
@@ -170,18 +254,21 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
     }
     
-    
-    override func viewDidAppear(animated: Bool) {
-        allDL().messageDL = self
-    }
     /*
+    override func viewDidAppear(animated: Bool) {
+        //接管消息代理
+        allDL().messageDL = self
+        //接管状态代理
+        allDL().stateDL = self
+    }
+    */
     override func viewDidAppear(animated: Bool) {//每次出现执行一次
         //取用户名
         let myID = NSUserDefaults.standardUserDefaults().stringForKey("wxID")
         //取自动登录
         let autoLogin = NSUserDefaults.standardUserDefaults().boolForKey("wxAutoLogin")
         //如果取到用户名或者自动登录，开始登陆
-        if ( myID != nil && autoLogin ){
+        if ( myID != nil && autoLogin && allDL().isAuth){
             self.login()
             
         }else{
@@ -189,11 +276,11 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
             self.performSegueWithIdentifier("toLoginSegue", sender: self)
         }
         //接管消息代理
-        allDL().massageDL = self
+        allDL().messageDL = self
         //接管状态代理
         allDL().stateDL = self
     }
-    */
+
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -242,25 +329,72 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
         //跳转到聊天界面
         self.performSegueWithIdentifier("toChatSegue", sender: self)
     }
-    /*
+    
     // Override to support conditional editing of the table view.
     override func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
         // Return NO if you do not want the specified item to be editable.
         return true
     }
-    */
-    /*
+    
     // Override to support editing the table view.
     override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         if editingStyle == .Delete {
-            // Delete the row from the data source
+            currenFriendName = stateList[indexPath.row].name
+            deleteFriend(currenFriendName)
+            //在要展示的列表中删除
+            for (index1 ,oldState) in enumerate(stateList) {
+                if (currenFriendName == oldState.name) {
+                    //找到就更新为离线
+                    stateList.removeAtIndex(index1)
+                    //找到就退出
+                    break
+                }
+            }
+            //在好友列表中删除
+            for (index2 ,oldState) in enumerate(friends) {
+                if (currenFriendName == oldState.name) {
+                    //找到就更新为离线
+                    friends.removeAtIndex(index2)
+                    //找到就退出
+                    break
+                }
+            }
+
             tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
         } else if editingStyle == .Insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
-    */
 
+    func deleteFriend(jidName:String){
+        /*var presence = DDXMLElement.elementWithName("presence") as! DDXMLElement
+        presence.addAttributeWithName("xmlns", stringValue: "jabber:client")
+        presence.addAttributeWithName("from", stringValue: allDL().xs!.myJID.description)
+        presence.addAttributeWithName("to", stringValue:jidName)
+        presence.addAttributeWithName("type", stringValue:"unsubscription")*/
+        
+        var iq = DDXMLElement.elementWithName("iq") as! DDXMLElement
+        iq.addAttributeWithName("from", stringValue: allDL().xs!.myJID.description)
+        iq.addAttributeWithName("type", stringValue: "set")
+
+        var query = DDXMLElement.elementWithName("query") as! DDXMLElement
+        query.addAttributeWithName("xmlns", stringValue: "jabber:iq:roster")
+        iq.addChild(query)
+        var item = DDXMLElement.elementWithName("item") as! DDXMLElement
+        item.addAttributeWithName("jid", stringValue:jidName)
+        item.addAttributeWithName("subscription", stringValue:"remove")
+        query.addChild(item)
+        allDL().xs!.sendElement(iq)
+        println(iq)
+        //同样可以
+        //取消已经允许的来历别人的订阅请求<presence to='romeo@example.net' type='unsubscribed'/>
+        //取消已经订阅的发给别人的订阅请求<presence to='juliet@example.com' type='unsubscribe'/>
+    }
+    
+    override func tableView(tableView: UITableView, titleForDeleteConfirmationButtonForRowAtIndexPath indexPath: NSIndexPath) -> String! {
+        return "删除好友"
+    }
+    
     /*
     // Override to support rearranging the table view.
     override func tableView(tableView: UITableView, moveRowAtIndexPath fromIndexPath: NSIndexPath, toIndexPath: NSIndexPath) {

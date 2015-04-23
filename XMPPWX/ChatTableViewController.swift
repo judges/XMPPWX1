@@ -64,9 +64,15 @@ class ChatTableViewController: UITableViewController, MessageDL {
         }
     }
 
+    var ad:AppDelegate?
+    
     func allDL() -> AppDelegate{
-        return UIApplication.sharedApplication().delegate as! AppDelegate
+        if ad == nil{
+            ad = UIApplication.sharedApplication().delegate as? AppDelegate
+        }
+        return ad!
     }
+
     
     //收到消息
     func newMsg(aMsg: Message) {

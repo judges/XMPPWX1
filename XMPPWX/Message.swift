@@ -20,8 +20,18 @@ struct Message {
 //状态结构
 struct State {
     var name:String = ""//用户名
+    var subscribeType:SubscribeType = .none
     var isOnline:Bool = false//在线与否
 }
+
+//订阅类型
+enum SubscribeType{
+    case none
+    case both
+    case from
+    case to
+}
+
 /*
 //更间接地删除，泛型函数,Int和String 实现相等Equatable协议
 func iR<T:Equatable>(value :T,inout aArray: [T]){

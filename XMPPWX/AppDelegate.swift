@@ -9,21 +9,109 @@
 import UIKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAlertViewDelegate{
     var window: UIWindow?
 
+    //var oi:integer_t?
+    //var router = XMPPRouter(xs?)
     //xmpp通道
     var xs:XMPPStream?
     //服务器是否开启，默认false
     var isOpen = false
-    //密码
-    var pwd = ""
-
+    var isAuth = false
     //状态代理
     var stateDL:StateDL?
     
     //消息代理
     var messageDL:MessageDL?
+    
+    //查询代理
+    var searchDL:SearchDL?
+    func xmppStream(sender: XMPPStream!, didSendPresence presence: XMPPPresence!) {
+        println(presence)
+    }
+    func xmppStream(sender: XMPPStream!, didFailToSendMessage message: XMPPMessage!, error: NSError!) {
+        println(error)
+    }
+    
+    func xmppStream(sender: XMPPStream!, didFailToSendIQ iq: XMPPIQ!, error: NSError!) {
+        //ok
+        println(error)
+    }
+    
+    func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
+        //
+        var buttontitle = alertView.buttonTitleAtIndex(buttonIndex)
+        if alertView.title == "好友申请"{
+            println(buttonIndex)
+            //if 0 表示同意 1 同意并订阅 2 不同意 3 取消
+            if buttontitle == "同意"{
+                //   <presence to='romeo@example.net' type='subscribed'/>
+                var presence = DDXMLElement.elementWithName("presence") as! DDXMLElement
+                presence.addAttributeWithName("to", stringValue: state!.name)
+                presence.addAttributeWithName("type", stringValue: "subscribed")
+                xs!.sendElement(presence)
+                stateDL?.isSubscribe(&state!)
+            }else if buttontitle == "同意并订阅" {
+                //同意
+                var presence0 = DDXMLElement.elementWithName("presence") as! DDXMLElement
+                presence0.addAttributeWithName("to", stringValue: state!.name)
+                presence0.addAttributeWithName("type", stringValue: "subscribed")
+                xs!.sendElement(presence0)
+                //请求定义<presence xmlns="jabber:client" from="liuz@ejabberd.liuzhao.com" to="fangzy@ejabberd.liuzhao.com/ios" type="subscribe"/>
+                var presence = DDXMLElement.elementWithName("presence") as! DDXMLElement
+                presence.addAttributeWithName("xmlns", stringValue: "jabber:client")
+                presence.addAttributeWithName("from", stringValue: xs!.myJID.description)
+                presence.addAttributeWithName("to", stringValue: state!.name)
+                presence.addAttributeWithName("type", stringValue: "subscribe")
+                xs!.sendElement(presence)
+                stateDL?.isSubscribe(&state!)
+            }else if buttontitle == "不同意" {
+                //<presence to='user@example.com' type='unsubscribed'/>
+                var presence = DDXMLElement.elementWithName("presence") as! DDXMLElement
+                presence.addAttributeWithName("to", stringValue: state!.name)
+                presence.addAttributeWithName("type", stringValue: "unsubscribed")
+                xs!.sendElement(presence)
+            }
+        }
+    }
+    
+    func xmppStream(sender: XMPPStream!, didReceiveIQ iq: XMPPIQ!) -> Bool {
+        //好友列表
+        println(iq)
+        if iq.type() == "result" && iq.childCount() != 0{
+            var query = iq.childElement() as DDXMLElement
+            if query.name() == "query" {
+                if query.xmlns() == "jabber:iq:roster" {
+                    var friend1 = query.children() as! [DDXMLElement]
+                    stateDL?.initStates(friend1)
+                    return true
+                }else if query.xmlns() == "jabber:iq:search" {
+                    var friend2 = query.children() as! [DDXMLElement]
+                    searchDL?.initSearchList(friend2)
+                    return true
+                }
+            }
+        }else if iq.type() == "get" && iq.childCount() > 0{
+            var query = iq.childElement() as DDXMLElement
+            if query.name() == "query" {
+                if query.xmlns() == "http://jabber.org/protocol/disco#info"{
+                    println("收到了查询http://jabber.org/protocol/disco#info的iq")
+                }
+            }
+        }
+        /*else if iq.type() == "set" && iq.childCount() != 0{
+            var query = iq.childElement() as DDXMLElement
+            if query.name() == "query" {
+                if query.xmlns() == "jabber:iq:roster" {
+                    var friend1 = query.children() as! [DDXMLElement]
+                    stateDL?.initStates(friend1)
+                    return true
+                }
+            }
+        }*/
+        return false
+    }
     
     //收到消息
     func xmppStream(sender: XMPPStream!, didReceiveMessage message: XMPPMessage!) {
@@ -64,7 +152,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate {
         
 
     }
-    
+    var state:State?
     //收到状态
     func xmppStream(sender: XMPPStream!, didReceivePresence presence: XMPPPresence!) {
         println(presence)
@@ -85,16 +173,54 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate {
         //如果状态不是自己的
         if(user != myUser){
             //状态保存的结构
-            var state = State()
+            state = State()
             //取得并保存状态的完整用户名
-            state.name = user + "@" + domain
+            state!.name = user + "@" + domain
             //上线
             if pType == "available"{
-                state.isOnline = true
-                stateDL?.isOn(state)
+                state!.isOnline = true
+                stateDL?.isOn(state!)
             }else if pType == "unavailable"{
-                state.isOnline = false
-                stateDL?.isOff(state)
+                state!.isOnline = false
+                stateDL?.isOff(state!)
+            }else if pType == "subscribe"{
+                var alert = UIAlertView()
+                alert.title = "好友申请"
+                alert.delegate = self
+                alert.message = state!.name + "申请订阅您的信息"
+                alert.addButtonWithTitle("同意")
+                alert.addButtonWithTitle("同意并订阅")
+                alert.addButtonWithTitle("不同意")
+                alert.addButtonWithTitle("取消")
+                alert.show()
+                stateDL?.isSubscribe(&state!)
+            }else if pType == "subscribed"{
+                var alert = UIAlertView()
+                alert.message = user+"同意了您的订阅"
+                alert.addButtonWithTitle("好的")
+                alert.show()
+                stateDL?.isSubscribed(&state!)
+                //请求disco#infor 但是iMessage回应503
+                /*var iq = DDXMLElement.elementWithName("iq") as! DDXMLElement
+                iq.addAttributeWithName("xmlns", stringValue: "jabber:client")
+                iq.addAttributeWithName("from", stringValue: xs!.myJID.description)
+                iq.addAttributeWithName("to", stringValue: state!.name)
+                iq.addAttributeWithName("id", stringValue:xs!.generateUUID())
+                iq.addAttributeWithName("type", stringValue: "get")
+                
+                var query = DDXMLElement.elementWithName("query") as! DDXMLElement
+                query.addAttributeWithName("xmlns", stringValue: "http://jabber.org/protocol/disco#infor")
+                
+                iq.addChild(query)
+                xs!.sendElement(iq)
+                println(iq)*/
+            }else if pType == "unsubscribed"{
+                var alert = UIAlertView()
+                alert.message = user+"关闭了您的订阅"
+                alert.addButtonWithTitle("好的")
+                alert.show()
+            }else{
+                println("ptype="+pType)
             }
         }
         
@@ -103,16 +229,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate {
     var user:String?
     var passwd:String?
     var server:String?
-    
+    var isReg = false
     func registerUser(){
         //注册用户
-        connect();
-        if(user != nil && passwd != nil){
-            xs!.myJID = XMPPJID.jidWithString(user!)
-            xs!.registerWithPassword(passwd, error: nil)
-        }
+        //设置注册状态
+        isReg = true
+        connect()
     }
-    
     func xmppStreamDidRegister(sender: XMPPStream!) {
         //注册成功
         var alert = UIAlertView()
@@ -130,6 +253,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate {
             alert.message = "forbidden 403"
         }else if err.attributeForName("code").stringValue() == "500"{
             alert.message = err.elementForName("text").stringValue()
+        }else if err.attributeForName("code").stringValue() == "409"{
+            alert.message = "用户名已经注册"
         }
         alert.addButtonWithTitle("ok")
         alert.show()
@@ -139,13 +264,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate {
     func xmppStreamDidConnect(sender: XMPPStream!) {
         isOpen = true
         //验证密码
-        xs!.authenticateWithPassword(pwd, error: nil)
+        println("++++++++++")
+        var error:NSError?
+        if(!isReg){
+            xs!.authenticateWithPassword(passwd, error: &error)
+        }else//要注册，就不会通过验证，就注册
+            if(xs!.supportsInBandRegistration() && user != nil && passwd != nil){
+                var error:NSError?
+                xs!.registerWithPassword(passwd, error: &error)
+                println("--------------------")
+                println(error)
+                isReg = false
+                return
+        }
+        
+        println(error)
     }
     
     //验证成功
     func xmppStreamDidAuthenticate(sender: XMPPStream!) {
         //上线
+        isAuth = true
+        println("ssssssssss")
         goOnline()
+    }
+    
+    func xmppStream(sender:XMPPStream!, didNotAuthenticate error:DDXMLElement!){
+        println("ffffffffffff")
+        println(error)
+        isAuth = false
     }
     
     //建立通道
@@ -159,15 +306,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate {
         var p = XMPPPresence()
         //发送任意内容表示上线
         xs!.sendElement(p)
+        queryFriends()
     }
     
     //发送下线状态
     func goOffline(){
         var p = XMPPPresence(type: "unavailable")
-        
         xs!.sendElement(p)
     }
-    
+    //查询好友
+    func queryFriends(){
+        var iq = DDXMLElement.elementWithName("iq") as! DDXMLElement
+        iq.addAttributeWithName("from", stringValue: xs!.myJID.description)
+        //iq.addAttributeWithName("to", stringValue: xs!.myJID.domain)不能加
+        iq.addAttributeWithName("id", stringValue:xs!.generateUUID())
+        iq.addAttributeWithName("type", stringValue: "get")
+        
+        var query = DDXMLElement.elementWithName("query") as! DDXMLElement
+        query.addAttributeWithName("xmlns", stringValue: "jabber:iq:roster")
+        
+        iq.addChild(query)
+        xs!.sendElement(iq)
+        println(iq)
+    }
+
     //连接服务器
     func connect()->Bool{
         //通道已经连接
@@ -175,21 +337,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate {
         passwd = NSUserDefaults.standardUserDefaults().stringForKey("wxPwd")
         server = NSUserDefaults.standardUserDefaults().stringForKey("wxServer")
         
-        if (xs != nil && xs!.isConnected()){
-            return true
-        }
         buildStream()
         //取得前台数据
         
         if user != nil && passwd != nil{
             //通道的用户名
-            xs!.myJID = XMPPJID.jidWithString(user!)
+            xs!.myJID = XMPPJID.jidWithString(user!, resource: "ios")
             //指定host
             xs!.hostName = server!
-            //密码备用
-            self.pwd = passwd!
+
             //连接，设置超时
-            xs!.connectWithTimeout(5000, error: nil)
+            var error:NSError?
+            println(xs!.connectWithTimeout(5000, error: &error).description)
+            println("===============")
+            println(error)
             return true
         }
         
@@ -199,6 +360,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate {
     //断开连接
     func disConnect(){
         if xs != nil && xs?.isConnected() == true {
+            isOpen = false
             goOffline()
             xs!.disconnect()
         }
