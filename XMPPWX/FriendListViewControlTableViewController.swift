@@ -235,7 +235,7 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
         //取自动登录
         let autoLogin = NSUserDefaults.standardUserDefaults().boolForKey("wxAutoLogin")
         //如果取到用户名或者自动登录，开始登陆
-        if ( myID != nil && autoLogin && allDL().isAuth ){
+        if ( myID != nil && autoLogin ){
             self.login()
             
         }else{
@@ -268,7 +268,7 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
         //取自动登录
         let autoLogin = NSUserDefaults.standardUserDefaults().boolForKey("wxAutoLogin")
         //如果取到用户名或者自动登录，开始登陆
-        if ( myID != nil && autoLogin && allDL().isAuth){
+        if ( myID != nil && autoLogin ){
             self.login()
             
         }else{

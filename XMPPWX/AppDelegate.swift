@@ -18,7 +18,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
     var xs:XMPPStream?
     //服务器是否开启，默认false
     var isOpen = false
-    var isAuth = false
     //状态代理
     var stateDL:StateDL?
     
@@ -27,6 +26,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
     
     //查询代理
     var searchDL:SearchDL?
+
+    func xmppStream(sender: XMPPStream!, didReceiveP2PFeatures streamFeatures: DDXMLElement!) {
+    //
+        println("000000000000000")
+        println(streamFeatures)
+    }
+
     func xmppStream(sender: XMPPStream!, didSendPresence presence: XMPPPresence!) {
         println(presence)
     }
@@ -284,7 +290,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
     //验证成功
     func xmppStreamDidAuthenticate(sender: XMPPStream!) {
         //上线
-        isAuth = true
+        let autologin = NSUserDefaults.standardUserDefaults().boolForKey("wxAutoLogin")
+        if autologin == true{
+            NSUserDefaults.standardUserDefaults().setBool(true, forKey: "wxAutoLogin")
+        }
         println("ssssssssss")
         goOnline()
     }
@@ -292,7 +301,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
     func xmppStream(sender:XMPPStream!, didNotAuthenticate error:DDXMLElement!){
         println("ffffffffffff")
         println(error)
-        isAuth = false
+        NSUserDefaults.standardUserDefaults().setBool(false, forKey: "wxAutoLogin")
     }
     
     //建立通道
@@ -369,6 +378,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        //添加一条注释
+        //添加一条注释
         return true
     }
 
