@@ -24,6 +24,8 @@ struct State {
     var isOnline:Bool = false//在线与否
 }
 
+//just for test
+
 //订阅类型
 enum SubscribeType{
     case none
