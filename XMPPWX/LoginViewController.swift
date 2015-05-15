@@ -35,13 +35,10 @@ class LoginViewController: UIViewController {
         //同步用户配置
         NSUserDefaults.standardUserDefaults().synchronize()
     }
-    
-    @IBAction func isTLS(sender: UISwitch) {
-        
-    }
-    @IBAction func registerAction(sender: UIBarButtonItem) {
+
+@IBAction func registerAction(sender: UIBarButtonItem) {
         userSyn()        
-        allDL().registerUser()        
+        allDL().registerUser()
     }
     //是否请求登陆
     var isRequireLogin = false

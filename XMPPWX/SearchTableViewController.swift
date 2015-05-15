@@ -33,6 +33,7 @@ class SearchTableViewController : UITableViewController, UISearchBarDelegate,Sea
 
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         //监听search点击事件，点击发送iq查询
+        
         var iqType = "jabber:iq:search"
         /*<iq type='set'
         from='romeo@montague.net/home'
@@ -92,6 +93,7 @@ class SearchTableViewController : UITableViewController, UISearchBarDelegate,Sea
     func addFriend(button:UIButton){
         /*<presence xmlns="jabber:client" from="liuz@ejabberd.liuzhao.com" to="fangzy@ejabberd.liuzhao.com/ios" type="subscribe"/>*/
         var friend = searchList[button.tag]
+        /*
         var presence = DDXMLElement.elementWithName("presence") as! DDXMLElement
         presence.addAttributeWithName("xmlns", stringValue: "jabber:client")
         presence.addAttributeWithName("from", stringValue: allDL().xs!.myJID.description)
@@ -99,6 +101,9 @@ class SearchTableViewController : UITableViewController, UISearchBarDelegate,Sea
         presence.addAttributeWithName("type", stringValue: "subscribe")
         
         allDL().xs!.sendElement(presence)
+        */
+        var jid = XMPPJID.jidWithString(friend)
+        allDL().xmppRoster?.addUser(jid, withNickname: friend)
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {

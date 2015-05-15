@@ -12,9 +12,16 @@ import Foundation
 struct Message {
     var body:String = ""//正文内容
     var from:String = ""//来自哪里
+    var nick:String = "" //昵称，现在只用于群聊
     var isComposing:Bool = false//输入中
-    var isDelay:Bool = false//离线文件
+    var isDelay:Bool = false//离线消息
     var isMe:Bool = false//本人所发
+    var isGroup:Bool = false//群组消息
+}
+
+struct Room {
+    var name:String = ""
+    var jid:String = ""
 }
 
 //状态结构
@@ -22,6 +29,8 @@ struct State {
     var name:String = ""//用户名
     var subscribeType:SubscribeType = .none
     var isOnline:Bool = false//在线与否
+    var isGroup:Bool = false
+    var nick:String = ""
 }
 
 //just for test

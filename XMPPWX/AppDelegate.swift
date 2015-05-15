@@ -9,7 +9,7 @@
 import UIKit
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAlertViewDelegate{
+class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAlertViewDelegate, XMPPRosterDelegate{
     var window: UIWindow?
 
     //var oi:integer_t?
@@ -26,6 +26,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
     
     //查询代理
     var searchDL:SearchDL?
+    
+    //房间代理
+    var roomsDL:RoomsDL?
 
     func xmppStream(sender: XMPPStream!, didReceiveP2PFeatures streamFeatures: DDXMLElement!) {
     //
@@ -33,16 +36,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
         println(streamFeatures)
     }
 
+    func xmppStream(sender: XMPPStream!, didSendIQ iq: XMPPIQ!) {
+        println(iq)
+        println("上边是我发送的iq")
+    }
+    
     func xmppStream(sender: XMPPStream!, didSendPresence presence: XMPPPresence!) {
         println(presence)
+        println("上边是我发送的presence")
     }
     func xmppStream(sender: XMPPStream!, didFailToSendMessage message: XMPPMessage!, error: NSError!) {
         println(error)
+        println("上边是我发送失败的message")
     }
-    
+
     func xmppStream(sender: XMPPStream!, didFailToSendIQ iq: XMPPIQ!, error: NSError!) {
         //ok
         println(error)
+        println("上边是我发送失败的iq")
     }
     
     func alertView(alertView: UIAlertView, clickedButtonAtIndex buttonIndex: Int) {
@@ -83,18 +94,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
     }
     
     func xmppStream(sender: XMPPStream!, didReceiveIQ iq: XMPPIQ!) -> Bool {
-        //好友列表
         println(iq)
+        println("上边是我收到的iq")
         if iq.type() == "result" && iq.childCount() != 0{
             var query = iq.childElement() as DDXMLElement
             if query.name() == "query" {
                 if query.xmlns() == "jabber:iq:roster" {
+                    //好友列表
                     var friend1 = query.children() as! [DDXMLElement]
                     stateDL?.initStates(friend1)
                     return true
                 }else if query.xmlns() == "jabber:iq:search" {
+                    //查询用户列表
                     var friend2 = query.children() as! [DDXMLElement]
                     searchDL?.initSearchList(friend2)
+                    return true
+                }else if query.xmlns() == "http://jabber.org/protocol/disco#items"{
+                    //聊天室列表
+                    var rooms = query.children() as! [DDXMLElement]
+                    roomsDL?.initRooms(rooms)
                     return true
                 }
             }
@@ -124,7 +142,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
         
         //如何知道，可以通过官方文档
         println(message)
-        println()
+        println("上边是我收到message")
 
         //如果是聊天文本消息
         if(message.isChatMessage()){
@@ -151,18 +169,37 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
             
             //完整用户名
             msg.from = message.from().user + "@" + message.from().domain
-            
+
+            msg.nick = message.from().user
             //添加到代理中
             messageDL?.newMsg(msg)
+        }else if(message.type() == "groupchat"){
+            //其他信息
+            var msg = Message()
+            msg.isGroup = true
+
+            if let body = message.elementForName("body"){
+                msg.body =  body.stringValue()
+            }
+            
+            if(message.elementsForName("delay") != nil){
+                msg.isDelay = true
+            }
+            
+            msg.from = message.from().user + "@" + message.from().domain
+
+            msg.nick = message.fromStr().lastPathComponent
+            
+            messageDL?.newMsg(msg)
         }
-        
 
     }
     var state:State?
+    var t:String?
     //收到状态
     func xmppStream(sender: XMPPStream!, didReceivePresence presence: XMPPPresence!) {
         println(presence)
-        println()
+        println("上边是我收到的presence")
         
         //我自己的用户名
         let myUser = sender.myJID.user
@@ -176,8 +213,35 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
         //状态类型
         let pType = presence.type()
         
+        //如果是群聊的状态
+        if domain.hasPrefix("conference"){
+            //收到某人退群的消息
+            /*<presence xmlns="jabber:client" from="gggaaa@conference.ejabberd.liuzhao.com/liuz" to="fangzy@ejabberd.liuzhao.com/ios" type="unavailable"><priority>0</priority><x xmlns="http://jabber.org/protocol/muc#user"><item affiliation="none" role="none"/></x></presence>*/
+            if presence.type() != nil && presence.type() == "unavailable"{
+                var amsg = Message()
+                amsg.nick = "通知："+presence.fromStr().lastPathComponent
+                amsg.isGroup = true
+                amsg.from = user + "@" + domain
+                amsg.body = "退出了群聊"
+                messageDL?.newMsg(amsg)
+            }else{
+                
+                state = State()
+                state!.name = user + "@" + domain
+                state!.isGroup = true
+                state!.nick = t!
+                stateDL?.isOn(state!)
+                
+                var amsg = Message()
+                amsg.nick = "通知："+presence.fromStr().lastPathComponent
+                amsg.isGroup = true
+                amsg.from = user + "@" + domain
+                amsg.body = "加入了群聊"
+                messageDL?.newMsg(amsg)
+            }
+        }
         //如果状态不是自己的
-        if(user != myUser){
+        else if(user != myUser){
             //状态保存的结构
             state = State()
             //取得并保存状态的完整用户名
@@ -283,7 +347,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
                 isReg = false
                 return
         }
-        
         println(error)
     }
     
@@ -296,6 +359,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
         }
         println("ssssssssss")
         goOnline()
+        //用于使用xmppRoster之后关联xmppStream
+        xmppRoster?.activate(xs!)
     }
     
     func xmppStream(sender:XMPPStream!, didNotAuthenticate error:DDXMLElement!){
@@ -303,11 +368,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
         println(error)
         NSUserDefaults.standardUserDefaults().setBool(false, forKey: "wxAutoLogin")
     }
+
+    func xmppRosterDidEndPopulating(sender:XMPPRoster){
+        var count = sender.accessibilityElementCount()
+        println("xmppRosterDidEndPopulating")
+//        for var i = 0 ; i < count ; i++ {
+//            var obj = sender.accessibilityElementAtIndex(i)
+//        }
+    }
+    func xmppRosterDidBeginPopulating(sender: XMPPRoster!) {
+        //
+        println("xmppRosterDidBeginPopulating")
+    }
     
+    var xmppRosterDataStorage:XMPPRosterCoreDataStorage?
+    var xmppRoster:XMPPRoster?
     //建立通道
     func buildStream(){
         xs = XMPPStream()
         xs?.addDelegate(self, delegateQueue: dispatch_get_main_queue())
+        //以下是后来使用xmpproster添加的初始化
+        xmppRosterDataStorage = XMPPRosterCoreDataStorage.sharedInstance()
+        xmppRoster = XMPPRoster(rosterStorage: xmppRosterDataStorage, dispatchQueue: dispatch_get_main_queue())
+        xmppRoster!.addDelegate(self, delegateQueue: dispatch_get_main_queue())
     }
     
     //发送上线状态
@@ -316,6 +399,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
         //发送任意内容表示上线
         xs!.sendElement(p)
         queryFriends()
+        xmppRoster?.fetchRoster()
     }
     
     //发送下线状态
@@ -323,6 +407,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
         var p = XMPPPresence(type: "unavailable")
         xs!.sendElement(p)
     }
+    
     //查询好友
     func queryFriends(){
         var iq = DDXMLElement.elementWithName("iq") as! DDXMLElement
@@ -345,6 +430,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
         user = NSUserDefaults.standardUserDefaults().stringForKey("wxID")
         passwd = NSUserDefaults.standardUserDefaults().stringForKey("wxPwd")
         server = NSUserDefaults.standardUserDefaults().stringForKey("wxServer")
+        var TLSLogin = NSUserDefaults.standardUserDefaults().boolForKey("wxTLSLogin")
+
         
         buildStream()
         //取得前台数据
@@ -354,15 +441,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
             xs!.myJID = XMPPJID.jidWithString(user!, resource: "ios")
             //指定host
             xs!.hostName = server!
-
+            if TLSLogin == true{
+                xs!.startTLSPolicy = XMPPStreamStartTLSPolicy.Required
+            }else{
+                xs!.startTLSPolicy = XMPPStreamStartTLSPolicy.Allowed
+            }
             //连接，设置超时
             var error:NSError?
-            println(xs!.connectWithTimeout(5000, error: &error).description)
+            println(xs!.connectWithTimeout(500, error: &error).description)
             println("===============")
             println(error)
             return true
         }
-        
         return false
     }
     

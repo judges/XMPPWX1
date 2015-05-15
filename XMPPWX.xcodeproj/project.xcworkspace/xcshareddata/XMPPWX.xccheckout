@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>2AB8614A-339B-49B5-99C2-BF24BE528BC9</string>
+	<key>IDESourceControlProjectName</key>
+	<string>XMPPWX</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>70D503292B19FE6BDB3C2AE87308757010F574AD</key>
+		<string>https://github.com/MrLiu0635/XMPPWX.git</string>
+		<key>B775552D1BBEEADC6A0BBB2FD048B6AA26CB309D</key>
+		<string>https://github.com/robbiehanson/XMPPFramework.git</string>
+		<key>CB884885E785456E530C5F3BAA8D001F1424D369</key>
+		<string>https://github.com/MrLiu0635/XMPPWX1.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>XMPPWX.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>70D503292B19FE6BDB3C2AE87308757010F574AD</key>
+		<string>../..XMPPWX</string>
+		<key>B775552D1BBEEADC6A0BBB2FD048B6AA26CB309D</key>
+		<string>../../../Users/liuz/Documents/XMPPFramework</string>
+		<key>CB884885E785456E530C5F3BAA8D001F1424D369</key>
+		<string>../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/MrLiu0635/XMPPWX1.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>CB884885E785456E530C5F3BAA8D001F1424D369</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>B775552D1BBEEADC6A0BBB2FD048B6AA26CB309D</string>
+			<key>IDESourceControlWCCName</key>
+			<string>XMPPFramework</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>CB884885E785456E530C5F3BAA8D001F1424D369</string>
+			<key>IDESourceControlWCCName</key>
+			<string>XMPPWX</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>70D503292B19FE6BDB3C2AE87308757010F574AD</string>
+			<key>IDESourceControlWCCName</key>
+			<string>XMPPWXXMPPWX</string>
+		</dict>
+	</array>
+</dict>
+</plist>

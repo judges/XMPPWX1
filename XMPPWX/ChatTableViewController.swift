@@ -13,6 +13,8 @@ class ChatTableViewController: UITableViewController, MessageDL {
     var toFriendName = ""
     //消息列表
     var msgList = [Message]()
+    //昵称
+    var nick:String = ""
     //录入文本框
     @IBOutlet weak var aMessageText: UITextField!
     //文本框正在输入
@@ -41,7 +43,11 @@ class ChatTableViewController: UITableViewController, MessageDL {
             //构建消息元素
             var XMLMessage = DDXMLElement.elementWithName("message") as! DDXMLElement
             //增加三个属性
-            XMLMessage.addAttributeWithName("type",stringValue:"chat")
+            if toFriendName.hasSuffix("conference.ejabberd.liuzhao.com"){
+                XMLMessage.addAttributeWithName("type",stringValue:"groupchat")
+            }else{
+                XMLMessage.addAttributeWithName("type",stringValue:"chat")
+            }
             XMLMessage.addAttributeWithName("to",stringValue:toFriendName)
             XMLMessage.addAttributeWithName("from",stringValue:NSUserDefaults.standardUserDefaults().stringForKey("wxID"))
             //构建正文，并加入到消息中
@@ -84,6 +90,9 @@ class ChatTableViewController: UITableViewController, MessageDL {
             //如果消息有正文，显示聊天对象，加入未读消息组，并刷新
             self.title = toFriendName
             //self.navigationController?.title = toFriendName
+            if aMsg.nick == nick{
+                return
+            }
             //加入
             msgList.append(aMsg)
             //刷新
@@ -94,8 +103,6 @@ class ChatTableViewController: UITableViewController, MessageDL {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //接管代理
-        allDL().messageDL =  self
     }
     
     override func didReceiveMemoryWarning() {
@@ -121,17 +128,20 @@ class ChatTableViewController: UITableViewController, MessageDL {
             //自己发的
             cell.textLabel?.textAlignment = .Right
             cell.textLabel?.textColor = UIColor.grayColor()
+            //设定单元格文本
+            cell.textLabel?.text = msg.body
         }else{
             //好友发的，自己收的
             cell.textLabel?.textColor = UIColor.blueColor()
+            //设定单元格文本
+            cell.textLabel?.text = msg.nick+" : "+msg.body
         }
-        //设定单元格文本
-        cell.textLabel?.text = msg.body
         
         return cell
     }
     
     override func viewDidAppear(animated: Bool) {
-        
+        //代理接管
+        allDL().messageDL =  self
     }
 }
