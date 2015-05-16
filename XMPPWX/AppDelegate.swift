@@ -468,8 +468,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, XMPPStreamDelegate,UIAler
     
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
-        //添加一条注释
-        //添加一条注释
         return true
     }
 

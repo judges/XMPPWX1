@@ -385,7 +385,7 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
     }
     
     func deleteFriend(jidName:String){
-        if jidName.hasSuffix("conference@ejabberd.liuzhao.com"){
+        if jidName.hasSuffix("@conference.ejabberd.liuzhao.com"){
             //退出一个聊天室
             /*
             <presence
@@ -394,7 +394,7 @@ class FriendListViewControlTableViewController: UITableViewController , MessageD
             type='unavailable'/>
             */
             var presence = DDXMLElement.elementWithName("presence") as! DDXMLElement
-            presence.addAttributeWithName("from", stringValue: allDL().xs!.myJID.description)
+            presence.addAttributeWithName("from", stringValue: allDL().xs!.myJID.user)
             presence.addAttributeWithName("to", stringValue: jidName)
             presence.addAttributeWithName("type", stringValue: "unavailable")
             allDL().xs!.sendElement(presence)

@@ -31,7 +31,7 @@ class LoginViewController: UIViewController {
         NSUserDefaults.standardUserDefaults().setObject(serverTextField.text, forKey: "wxServer")
         //是否勾选自动登录
         NSUserDefaults.standardUserDefaults().setBool(self.autoLoginSwith.on, forKey: "wxAutoLogin")
-        NSUserDefaults.standardUserDefaults().setBool(self.TLSLogin.on, forKey: "wxTLSLogin")
+        NSUserDefaults.standardUserDefaults().setBool(false, forKey: "wxTLSLogin")
         //同步用户配置
         NSUserDefaults.standardUserDefaults().synchronize()
     }
